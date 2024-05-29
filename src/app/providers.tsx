@@ -1,13 +1,17 @@
-// app/providers.tsx
 "use client";
 
-import AccountProvider from "@/context/account-context";
 import { NextUIProvider } from "@nextui-org/react";
+import dynamic from "next/dynamic";
+
+const DynamicAccountProvider = dynamic(
+  () => import("@/context/account-context"),
+  { ssr: false }
+);
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <NextUIProvider>
-      <AccountProvider>{children}</AccountProvider>
+      <DynamicAccountProvider>{children}</DynamicAccountProvider>
     </NextUIProvider>
   );
 }

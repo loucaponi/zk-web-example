@@ -3,7 +3,7 @@ import { Button, Code, Input } from "@nextui-org/react";
 import { useCallback, useState } from "react";
 const snarkjs = require("snarkjs");
 
-export default function Home() {
+export default function FactorizationProverPage() {
   const [a, setA] = useState("");
   const [b, setB] = useState("");
   const [creating, setCreating] = useState(false);
