@@ -33,6 +33,7 @@ export default function BasicProof({ mockProof, proofType, pallet }: Props) {
     setStatus("loading");
 
     let unsub: () => void;
+    let txSuccessEvent = false;
 
     try {
       unsub = await api?.tx[pallet].submitProof(mockProof).signAndSend(
@@ -46,18 +47,23 @@ export default function BasicProof({ mockProof, proofType, pallet }: Props) {
             setErrorText(`Something went wrong: ${dispatchError}`);
             unsub();
           }
-          console.log(`Current status is ${status}`);
 
-          if (status.isInBlock) {
-            console.log(
-              `Transaction included at blockHash ${status.asInBlock}`
-            );
-          } else if (status.isFinalized) {
-            console.log(
-              `Transaction finalized at blockHash ${status.asFinalized}`
-            );
-            setStatus("success");
-            setBlockHash(status.asFinalized.toString());
+          // Must see the ExtrinsicSuccess event to be sure the tx is successful
+          events.forEach(({ event: { data, method, section }, phase }) => {
+            if (section == "system" && method == "ExtrinsicSuccess") {
+              txSuccessEvent = true;
+            }
+          });
+
+          if (status.isFinalized) {
+            if (txSuccessEvent) {
+              setStatus("success");
+              setBlockHash(status.asFinalized.toString());
+            } else {
+              setStatus("error");
+              setErrorText("ExtrinsicSuccess has not been seen");
+            }
+
             unsub();
           }
         }
