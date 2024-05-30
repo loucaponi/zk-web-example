@@ -1,12 +1,12 @@
 "use client";
 
-import { useAccountContext } from "@/context/account-context";
+import { useZKV } from "@/context/zkv-provider";
 import { Button } from "@nextui-org/react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Navbar() {
-  const { connectedAccount, handleConnectWallet } = useAccountContext();
+  const { connectedAccount, handleConnectWallet } = useZKV();
   return (
     <div className="flex h-[75px] w-full items-center px-8 bg-gray-50">
       <Link href="/">

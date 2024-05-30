@@ -1,7 +1,7 @@
 "use client";
 
-import { BLOCK_EXPLORER_BASE_URL, MOCK_FFLONK_PROOF } from "@/constants";
-import { useAccountContext } from "@/context/account-context";
+import { BLOCK_EXPLORER_BASE_URL } from "@/constants";
+import { useZKV } from "@/context/zkv-provider";
 import { Button, Link, ScrollShadow } from "@nextui-org/react";
 import { useCallback, useState } from "react";
 
@@ -12,9 +12,12 @@ type Props = {
 };
 
 export default function BasicProof({ mockProof, proofType, pallet }: Props) {
-  const { connectedAccount, api, handleConnectWallet } = useAccountContext();
-  const [loading, setLoading] = useState(false);
-  const [blockHash, setBlockHash] = useState("");
+  const { connectedAccount, api, handleConnectWallet } = useZKV();
+  const [status, setStatus] = useState<"loading" | "error" | "success" | null>(
+    null
+  );
+  const [errorText, setErrorText] = useState<string | null>(null);
+  const [blockHash, setBlockHash] = useState<string | null>(null);
 
   const submitProof = useCallback(async () => {
     if (!api || !connectedAccount) {
@@ -25,8 +28,11 @@ export default function BasicProof({ mockProof, proofType, pallet }: Props) {
     const { web3FromAddress } = await import("@polkadot/extension-dapp");
 
     const injector = await web3FromAddress(connectedAccount.address);
-    setBlockHash("");
-    setLoading(true);
+
+    // Reset states
+    setBlockHash(null);
+    setErrorText(null);
+    setStatus("loading");
 
     const unsub = await api?.tx[pallet].submitProof(mockProof).signAndSend(
       connectedAccount.address,
@@ -34,6 +40,11 @@ export default function BasicProof({ mockProof, proofType, pallet }: Props) {
         signer: injector.signer,
       },
       ({ status, events, dispatchError }) => {
+        if (dispatchError) {
+          setStatus("error");
+          setErrorText(`Something went wrong: ${dispatchError}`);
+          unsub();
+        }
         console.log(`Current status is ${status}`);
 
         if (status.isInBlock) {
@@ -42,7 +53,7 @@ export default function BasicProof({ mockProof, proofType, pallet }: Props) {
           console.log(
             `Transaction finalized at blockHash ${status.asFinalized}`
           );
-          setLoading(false);
+          setStatus("success");
           setBlockHash(status.asFinalized.toString());
           unsub();
         }
@@ -63,12 +74,12 @@ export default function BasicProof({ mockProof, proofType, pallet }: Props) {
         onClick={connectedAccount ? submitProof : handleConnectWallet}
         type="button"
         className=" bg-emerald-400 mt-3"
-        isDisabled={loading}
-        isLoading={loading}
+        isDisabled={status === "loading"}
+        isLoading={status === "loading"}
       >
         {connectedAccount ? "Submit Proof" : "Connect Wallet"}
       </Button>
-      {!loading && blockHash && (
+      {status === "success" && blockHash && (
         <div className="mt-2">
           Proof Verified! Tx included in block.{" "}
           <Link
@@ -78,6 +89,9 @@ export default function BasicProof({ mockProof, proofType, pallet }: Props) {
             View on Block Explorer
           </Link>
         </div>
+      )}
+      {status === "error" && errorText && (
+        <div className="mt-2 text-red-900">{errorText}</div>
       )}
     </div>
   );

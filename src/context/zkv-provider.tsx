@@ -12,21 +12,21 @@ import {
   useState,
 } from "react";
 
-type AccountContextState = {
+type ZKVProviderState = {
   connectedAccount?: InjectedAccountWithMeta;
   api?: ApiPromise;
   handleConnectWallet: () => Promise<void>;
 };
 
-const AccountContext = createContext<AccountContextState>({
+const ZKVContext = createContext<ZKVProviderState>({
   handleConnectWallet: () => Promise.resolve(),
 });
 
-export function useAccountContext() {
-  return useContext(AccountContext);
+export function useZKV() {
+  return useContext(ZKVContext);
 }
 
-export default function AccountProvider({
+export default function ZKVProvider({
   children,
 }: {
   children: React.ReactNode;
@@ -60,10 +60,8 @@ export default function AccountProvider({
   }, []);
 
   return (
-    <AccountContext.Provider
-      value={{ api, connectedAccount, handleConnectWallet }}
-    >
+    <ZKVContext.Provider value={{ api, connectedAccount, handleConnectWallet }}>
       {children}
-    </AccountContext.Provider>
+    </ZKVContext.Provider>
   );
 }
