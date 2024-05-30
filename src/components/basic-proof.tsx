@@ -34,33 +34,46 @@ export default function BasicProof({ mockProof, proofType, pallet }: Props) {
     setErrorText(null);
     setStatus("loading");
 
-    const unsub = await api?.tx[pallet].submitProof(mockProof).signAndSend(
-      connectedAccount.address,
-      {
-        signer: injector.signer,
-      },
-      ({ status, events, dispatchError }) => {
-        if (dispatchError) {
-          setStatus("error");
-          setErrorText(`Something went wrong: ${dispatchError}`);
-          unsub();
-        }
-        console.log(`Current status is ${status}`);
+    let unsub: () => void;
 
-        if (status.isInBlock) {
-          console.log(`Transaction included at blockHash ${status.asInBlock}`);
-        } else if (status.isFinalized) {
-          console.log(
-            `Transaction finalized at blockHash ${status.asFinalized}`
-          );
-          setStatus("success");
-          setBlockHash(status.asFinalized.toString());
-          unsub();
-        }
-      }
-    );
+    try {
+      unsub = await api?.tx[pallet].submitProof(mockProof).signAndSend(
+        connectedAccount.address,
+        {
+          signer: injector.signer,
+        },
+        ({ status, events, dispatchError }) => {
+          if (dispatchError) {
+            setStatus("error");
+            setErrorText(`Something went wrong: ${dispatchError}`);
+            unsub();
+          }
+          console.log(`Current status is ${status}`);
 
-    return unsub;
+          if (status.isInBlock) {
+            console.log(
+              `Transaction included at blockHash ${status.asInBlock}`
+            );
+          } else if (status.isFinalized) {
+            console.log(
+              `Transaction finalized at blockHash ${status.asFinalized}`
+            );
+            setStatus("success");
+            setBlockHash(status.asFinalized.toString());
+            unsub();
+          }
+        }
+      );
+
+      return unsub;
+    } catch (e: unknown) {
+      setStatus("error");
+      setErrorText(
+        `Something went wrong: ${
+          e instanceof Error ? e.message : "Could not submit proof"
+        }`
+      );
+    }
   }, [api, connectedAccount, mockProof, pallet]);
 
   return (
@@ -71,13 +84,13 @@ export default function BasicProof({ mockProof, proofType, pallet }: Props) {
       </ScrollShadow>
 
       <Button
-        onClick={connectedAccount ? submitProof : handleConnectWallet}
+        onClick={submitProof}
         type="button"
         className=" bg-emerald-400 mt-3"
-        isDisabled={status === "loading"}
+        isDisabled={status === "loading" || !connectedAccount}
         isLoading={status === "loading"}
       >
-        {connectedAccount ? "Submit Proof" : "Connect Wallet"}
+        Submit Proof
       </Button>
       {status === "success" && blockHash && (
         <div className="mt-2">

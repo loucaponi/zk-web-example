@@ -16,10 +16,12 @@ type ZKVProviderState = {
   connectedAccount?: InjectedAccountWithMeta;
   api?: ApiPromise;
   handleConnectWallet: () => Promise<void>;
+  handleDisconnectWallet: () => void;
 };
 
 const ZKVContext = createContext<ZKVProviderState>({
   handleConnectWallet: () => Promise.resolve(),
+  handleDisconnectWallet: () => {},
 });
 
 export function useZKV() {
@@ -59,8 +61,19 @@ export default function ZKVProvider({
     setConnectedAccount(allAccounts[0]);
   }, []);
 
+  const handleDisconnectWallet = useCallback(async () => {
+    setConnectedAccount(undefined);
+  }, []);
+
   return (
-    <ZKVContext.Provider value={{ api, connectedAccount, handleConnectWallet }}>
+    <ZKVContext.Provider
+      value={{
+        api,
+        connectedAccount,
+        handleConnectWallet,
+        handleDisconnectWallet,
+      }}
+    >
       {children}
     </ZKVContext.Provider>
   );
