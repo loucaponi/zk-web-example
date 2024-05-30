@@ -1,8 +1,11 @@
 "use client";
 
-import BasicProof from "@/components/basic-proof";
 import { MOCK_BOOJUM_PROOF, MOCK_FFLONK_PROOF } from "@/constants";
 import { Tab, Tabs } from "@nextui-org/react";
+import dynamic from "next/dynamic";
+const BasicProof = dynamic(() => import("@/components/basic-proof"), {
+  ssr: false,
+});
 
 export default function BasicProofSubmissionPage() {
   return (

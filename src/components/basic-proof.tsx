@@ -3,6 +3,7 @@
 import { BLOCK_EXPLORER_BASE_URL } from "@/constants";
 import { useZKV } from "@/context/zkv-provider";
 import { Button, Link, ScrollShadow } from "@nextui-org/react";
+import { web3FromAddress } from "@polkadot/extension-dapp";
 import { useCallback, useState } from "react";
 
 type Props = {
@@ -12,7 +13,7 @@ type Props = {
 };
 
 export default function BasicProof({ mockProof, proofType, pallet }: Props) {
-  const { connectedAccount, api, handleConnectWallet } = useZKV();
+  const { connectedAccount, api } = useZKV();
   const [status, setStatus] = useState<"loading" | "error" | "success" | null>(
     null
   );
@@ -23,9 +24,6 @@ export default function BasicProof({ mockProof, proofType, pallet }: Props) {
     if (!api || !connectedAccount) {
       return;
     }
-
-    // Rely on a dynamic import to fix build issue
-    const { web3FromAddress } = await import("@polkadot/extension-dapp");
 
     const injector = await web3FromAddress(connectedAccount.address);
 
