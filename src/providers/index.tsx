@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 
 // This component references `window` under the hood
 // Fix pre-render errors
-const ZKVProvider = dynamic(() => import("@/context/zkv-provider"), {
+const ZKVProvider = dynamic(() => import("@/providers/zkv-provider"), {
   ssr: false,
 });
 

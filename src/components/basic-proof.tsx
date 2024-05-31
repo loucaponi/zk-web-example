@@ -1,7 +1,7 @@
 "use client";
 
 import { BLOCK_EXPLORER_BASE_URL } from "@/constants";
-import { useZKV } from "@/context/zkv-provider";
+import { useZKV } from "@/providers/zkv-provider";
 import { Button, Link, ScrollShadow } from "@nextui-org/react";
 import { web3FromAddress } from "@polkadot/extension-dapp";
 import { useCallback, useState } from "react";

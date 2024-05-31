@@ -1,6 +1,6 @@
 "use client";
 
-import { useZKV } from "@/context/zkv-provider";
+import { useZKV } from "@/providers/zkv-provider";
 import {
   Button,
   Dropdown,
