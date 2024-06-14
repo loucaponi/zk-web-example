@@ -1,20 +1,11 @@
 "use client";
 
+import BoojumProof from "@/components/boojum-proof";
+import FflonkProof from "@/components/fflonk-proof";
+import Groth16Proof from "@/components/groth16-proof";
+import RiscZeroProof from "@/components/risc-zero-proof";
 import { MOCK_FFLONK_PROOF } from "@/constants";
 import { Tab, Tabs } from "@nextui-org/react";
-import dynamic from "next/dynamic";
-const FflonkProof = dynamic(() => import("@/components/fflonk-proof"), {
-  ssr: false,
-});
-const BoojumProof = dynamic(() => import("@/components/boojum-proof"), {
-  ssr: false,
-});
-const RiscZeroProof = dynamic(() => import("@/components/risc-zero-proof"), {
-  ssr: false,
-});
-const Groth16Proof = dynamic(() => import("@/components/groth16-proof"), {
-  ssr: false,
-});
 
 export default function Home() {
   return (

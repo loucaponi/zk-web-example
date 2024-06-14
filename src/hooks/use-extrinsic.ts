@@ -10,13 +10,17 @@ export type Pallet =
   | "settlementGroth16Pallet";
 export type Extrinsic = "submitProof";
 
-type Inputs = {
+export type UseExtrinsicArgs = {
   pallet: Pallet;
   extrinsic: Extrinsic;
   args: any[];
 };
 
-export default function useExtrinsic({ pallet, extrinsic, args }: Inputs) {
+export default function useExtrinsic({
+  pallet,
+  extrinsic,
+  args,
+}: UseExtrinsicArgs) {
   const { connectedAccount, api } = useZKV();
   const [status, setStatus] = useState<Status>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
